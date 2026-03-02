@@ -7,18 +7,18 @@ def extract_product_name(link):
     try:
         name = link.split("/")[-1]
         name = name.replace("-", " ")
-        return name.title()
+        return name.upper()
     except:
         return "Sample Product"
 
-def generate_dummy_data():
-    platforms = ["Amazon", "Flipkart", "Meesho"]
+def generate_comparison():
+    platforms = ["Amazon", "Flipkart", "Croma"]
     data = []
 
     for platform in platforms:
         price = random.randint(45000, 55000)
         rating = round(random.uniform(4.0, 4.8), 1)
-        reviews = random.randint(1000, 15000)
+        reviews = random.randint(1000, 20000)
 
         data.append({
             "platform": platform,
@@ -27,7 +27,6 @@ def generate_dummy_data():
             "reviews": reviews
         })
 
-    # Find lowest price
     best_price = min(item["price"] for item in data)
 
     for item in data:
@@ -43,13 +42,11 @@ def home():
     if request.method == "POST":
         link = request.form.get("link")
         product_name = extract_product_name(link)
-        comparison = generate_dummy_data()
+        comparison = generate_comparison()
 
-    return render_template(
-        "index.html",
-        comparison=comparison,
-        product_name=product_name
-    )
+    return render_template("index.html",
+                           comparison=comparison,
+                           product_name=product_name)
 
 if __name__ == "__main__":
     app.run(debug=True)
