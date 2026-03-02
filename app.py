@@ -1,75 +1,79 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from urllib.parse import urlparse, quote_plus
 from datetime import datetime
 
 app = Flask(__name__)
 
 APP_NAME = "ShopIQ"
-VERSION = "1.0"
+VERSION = "2.0"
 
 
-# Home route
 @app.route("/")
 def home():
-    return jsonify({
-        "app": APP_NAME,
-        "version": VERSION,
-        "status": "running"
-    })
+    return render_template("index.html")
 
 
-# Extract product name from URL
 def extract_product_name(url):
-    parsed = urlparse(url)
-    path = parsed.path
-    parts = path.split("/")
+    try:
+        parsed = urlparse(url)
+        path = parsed.path
+        parts = path.split("/")
 
-    for part in parts:
-        if "-" in part and not part.lower().startswith("dp"):
-            return part.replace("-", " ")
+        for part in parts:
+            if "-" in part and not part.lower().startswith("dp"):
+                return part.replace("-", " ")
 
-    return parts[-1]
+        return parts[-1]
+    except Exception:
+        return "Unknown Product"
 
 
-# Generate affiliate-ready search links
-def generate_search_links(product_name):
+def generate_platform_data(product_name):
     encoded_name = quote_plus(product_name)
 
-    # Replace YOURTAG with real affiliate tag later
-    amazon_url = f"https://www.amazon.in/s?k={encoded_name}&tag=YOURTAG"
-    flipkart_url = f"https://www.flipkart.com/search?q={encoded_name}"
-
     return {
-        "amazon": amazon_url,
-        "flipkart": flipkart_url
+        "Amazon": {
+            "price": None,
+            "rating": None,
+            "url": f"https://www.amazon.in/s?k={encoded_name}&tag=YOURTAG"
+        },
+        "Flipkart": {
+            "price": None,
+            "rating": None,
+            "url": f"https://www.flipkart.com/search?q={encoded_name}"
+        },
+        "Croma": {
+            "price": None,
+            "rating": None,
+            "url": f"https://www.croma.com/searchB?q={encoded_name}"
+        }
     }
 
 
-# Compare route
 @app.route("/compare", methods=["GET"])
 def compare():
     link = request.args.get("link")
 
     if not link:
-        return jsonify({"error": "Product link is required"}), 400
+        return jsonify({
+            "success": False,
+            "error": "Product link is required"
+        }), 400
 
     product_name = extract_product_name(link)
+    platforms = generate_platform_data(product_name)
 
-    search_links = generate_search_links(product_name)
-
-    response = {
+    return jsonify({
+        "success": True,
         "app": APP_NAME,
         "version": VERSION,
         "timestamp": datetime.utcnow().isoformat(),
         "product": {
-            "original_link": link,
-            "name": product_name
+            "name": product_name,
+            "original_link": link
         },
-        "comparison_links": search_links,
-        "note": "Prices and availability may vary on platform."
-    }
-
-    return jsonify(response)
+        "platforms": platforms
+    })
 
 
 if __name__ == "__main__":
