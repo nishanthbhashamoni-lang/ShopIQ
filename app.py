@@ -1,80 +1,55 @@
-from flask import Flask, request, jsonify, render_template
-from urllib.parse import urlparse, quote_plus
-from datetime import datetime
+from flask import Flask, render_template, request
+import random
 
 app = Flask(__name__)
 
-APP_NAME = "ShopIQ"
-VERSION = "2.0"
-
-
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-
-def extract_product_name(url):
+def extract_product_name(link):
     try:
-        parsed = urlparse(url)
-        path = parsed.path
-        parts = path.split("/")
+        name = link.split("/")[-1]
+        name = name.replace("-", " ")
+        return name.title()
+    except:
+        return "Sample Product"
 
-        for part in parts:
-            if "-" in part and not part.lower().startswith("dp"):
-                return part.replace("-", " ")
+def generate_dummy_data():
+    platforms = ["Amazon", "Flipkart", "Meesho"]
+    data = []
 
-        return parts[-1]
-    except Exception:
-        return "Unknown Product"
+    for platform in platforms:
+        price = random.randint(45000, 55000)
+        rating = round(random.uniform(4.0, 4.8), 1)
+        reviews = random.randint(1000, 15000)
 
+        data.append({
+            "platform": platform,
+            "price": price,
+            "rating": rating,
+            "reviews": reviews
+        })
 
-def generate_platform_data(product_name):
-    encoded_name = quote_plus(product_name)
+    # Find lowest price
+    best_price = min(item["price"] for item in data)
 
-    return {
-        "Amazon": {
-            "price": None,
-            "rating": None,
-            "url": f"https://www.amazon.in/s?k={encoded_name}&tag=YOURTAG"
-        },
-        "Flipkart": {
-            "price": None,
-            "rating": None,
-            "url": f"https://www.flipkart.com/search?q={encoded_name}"
-        },
-        "Croma": {
-            "price": None,
-            "rating": None,
-            "url": f"https://www.croma.com/searchB?q={encoded_name}"
-        }
-    }
+    for item in data:
+        item["best"] = item["price"] == best_price
 
+    return data
 
-@app.route("/compare", methods=["GET"])
-def compare():
-    link = request.args.get("link")
+@app.route("/", methods=["GET", "POST"])
+def home():
+    comparison = None
+    product_name = None
 
-    if not link:
-        return jsonify({
-            "success": False,
-            "error": "Product link is required"
-        }), 400
+    if request.method == "POST":
+        link = request.form.get("link")
+        product_name = extract_product_name(link)
+        comparison = generate_dummy_data()
 
-    product_name = extract_product_name(link)
-    platforms = generate_platform_data(product_name)
-
-    return jsonify({
-        "success": True,
-        "app": APP_NAME,
-        "version": VERSION,
-        "timestamp": datetime.utcnow().isoformat(),
-        "product": {
-            "name": product_name,
-            "original_link": link
-        },
-        "platforms": platforms
-    })
-
+    return render_template(
+        "index.html",
+        comparison=comparison,
+        product_name=product_name
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
