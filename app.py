@@ -9,15 +9,15 @@ def extract_product_name(link):
         name = name.replace("-", " ")
         return name.upper()
     except:
-        return "Sample Product"
+        return "Product"
 
 def generate_comparison():
     platforms = ["Amazon", "Flipkart", "Croma"]
     data = []
 
     for platform in platforms:
-        price = random.randint(45000, 55000)
-        rating = round(random.uniform(4.0, 4.8), 1)
+        price = random.randint(10000, 50000)
+        rating = round(random.uniform(3.5, 4.8), 1)
         reviews = random.randint(1000, 20000)
 
         data.append({
@@ -34,19 +34,32 @@ def generate_comparison():
 
     return data
 
-@app.route("/", methods=["GET", "POST"])
+
+@app.route("/", methods=["GET"])
 def home():
-    comparison = None
-    product_name = None
+    return render_template("index.html")
 
-    if request.method == "POST":
-        link = request.form.get("link")
-        product_name = extract_product_name(link)
-        comparison = generate_comparison()
 
-    return render_template("index.html",
-                           comparison=comparison,
-                           product_name=product_name)
+@app.route("/compare", methods=["POST"])
+def compare():
+
+    link = request.form.get("link")
+
+    product_name = extract_product_name(link)
+
+    comparison = generate_comparison()
+
+    return render_template(
+        "results.html",
+        product_name=product_name,
+        comparison=comparison
+    )
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)

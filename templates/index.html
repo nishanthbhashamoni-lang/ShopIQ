@@ -1,113 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ShopIQ</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f3;
-            text-align: center;
-            margin: 0;
-        }
+<title>ShopIQ</title>
 
-        .container {
-            padding: 60px 20px;
-        }
+<script src="https://cdn.tailwindcss.com"></script>
 
-        input {
-            width: 60%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: none;
-            background: #5a7f66;
-            color: white;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #486653;
-        }
-
-        table {
-            width: 100%;
-            max-width: 900px;
-            margin: 40px auto;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        th, td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            background: #e6f0ea;
-        }
-
-        .best {
-            background: #dff5e8;
-            font-weight: bold;
-        }
-
-        .badge {
-            background: green;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            margin-left: 6px;
-        }
-    </style>
 </head>
-<body>
 
-<div class="container">
-    <h1>ShopIQ</h1>
+<body class="bg-gray-50">
 
-    <form method="POST">
-        <input type="text" name="link" placeholder="Paste product link..." required>
-        <button type="submit">Compare</button>
-    </form>
+<header class="bg-white shadow">
+<div class="max-w-7xl mx-auto flex justify-between items-center p-4">
 
-    {% if comparison %}
-        <h2>{{ product_name }}</h2>
+<h1 class="text-2xl font-bold text-green-600">ShopIQ</h1>
 
-        <table>
-            <tr>
-                <th>Platform</th>
-                <th>Price</th>
-                <th>Rating</th>
-                <th>Reviews</th>
-            </tr>
+<nav class="space-x-6">
+<a href="/">Home</a>
+<a href="/about">About</a>
+</nav>
 
-            {% for item in comparison %}
-            <tr class="{% if item.best %}best{% endif %}">
-                <td>
-                    {{ item.platform }}
-                    {% if item.best %}
-                        <span class="badge">Best Deal</span>
-                    {% endif %}
-                </td>
-                <td>₹{{ item.price }}</td>
-                <td>⭐ {{ item.rating }}</td>
-                <td>{{ item.reviews }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
 </div>
+</header>
+
+<section class="text-center py-24">
+
+<h1 class="text-6xl font-bold">
+Shop Smarter
+<span class="text-green-600">Buy Better</span>
+</h1>
+
+<p class="text-gray-600 mt-6">
+Compare prices across Amazon, Flipkart, Croma and more.
+</p>
+
+<form action="/compare" method="POST" class="mt-10 flex justify-center gap-4">
+
+<input
+name="link"
+placeholder="Paste product link here..."
+class="border px-6 py-3 rounded-lg w-96"
+/>
+
+<button
+class="bg-green-600 text-white px-6 py-3 rounded-lg">
+Compare Now
+</button>
+
+</form>
+
+</section>
 
 </body>
 </html>
