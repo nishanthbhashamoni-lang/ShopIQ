@@ -3,39 +3,7 @@ import random
 
 app = Flask(__name__)
 
-def extract_product_name(link):
-    try:
-        name = link.split("/")[-1]
-        name = name.replace("-", " ")
-        return name.upper()
-    except:
-        return "Product"
-
-def generate_comparison():
-    platforms = ["Amazon", "Flipkart", "Croma"]
-    data = []
-
-    for platform in platforms:
-        price = random.randint(10000, 50000)
-        rating = round(random.uniform(3.5, 4.8), 1)
-        reviews = random.randint(1000, 20000)
-
-        data.append({
-            "platform": platform,
-            "price": price,
-            "rating": rating,
-            "reviews": reviews
-        })
-
-    best_price = min(item["price"] for item in data)
-
-    for item in data:
-        item["best"] = item["price"] == best_price
-
-    return data
-
-
-@app.route("/", methods=["GET"])
+@app.route("/")
 def home():
     return render_template("index.html")
 
@@ -43,22 +11,38 @@ def home():
 @app.route("/compare", methods=["POST"])
 def compare():
 
-    link = request.form.get("link")
+    product_link = request.form.get("product")
 
-    product_name = extract_product_name(link)
+    # demo prices
+    prices = {
+        "Amazon": random.randint(500,2000),
+        "Flipkart": random.randint(500,2000),
+        "Croma": random.randint(500,2000)
+    }
 
-    comparison = generate_comparison()
+    best_price = min(prices.values())
 
     return render_template(
-        "results.html",
-        product_name=product_name,
-        comparison=comparison
+        "compare.html",
+        product_link=product_link,
+        prices=prices,
+        best_price=best_price
     )
 
 
-@app.route("/about")
-def about():
-    return render_template("about.html")
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
+@app.route("/disclosure")
+def disclosure():
+    return render_template("disclosure.html")
 
 
 if __name__ == "__main__":
