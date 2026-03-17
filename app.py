@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import random
+import os
 
 app = Flask(__name__)
 
@@ -10,14 +11,13 @@ def home():
 
 @app.route("/compare", methods=["POST"])
 def compare():
-
     product_link = request.form.get("product")
 
     # demo prices
     prices = {
-        "Amazon": random.randint(500,2000),
-        "Flipkart": random.randint(500,2000),
-        "Croma": random.randint(500,2000)
+        "Amazon": random.randint(500, 2000),
+        "Flipkart": random.randint(500, 2000),
+        "Croma": random.randint(500, 2000)
     }
 
     best_price = min(prices.values())
@@ -45,5 +45,7 @@ def disclosure():
     return render_template("disclosure.html")
 
 
+# ✅ IMPORTANT FIX FOR RENDER
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
