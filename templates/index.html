@@ -2,206 +2,115 @@
 <html>
 
 <head>
-
-<title>ShopIQ</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-html{
-scroll-behavior:smooth;
-}
-</style>
-
+    <title>ShopIQ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body class="bg-gray-100">
-
+<body class="bg-gray-950 text-white">
 
 <!-- NAVBAR -->
+<div class="flex flex-wrap justify-between items-center px-4 md:px-10 py-4 border-b border-gray-800">
 
-<nav class="flex justify-between items-center px-10 py-4 bg-white shadow sticky top-0 z-50">
+    <div class="flex items-center gap-2">
+        <img src="/static/logo.png" class="w-8 h-8 rounded-full">
+        <h1 class="text-lg md:text-xl font-bold text-green-500">ShopIQ</h1>
+    </div>
 
-<div class="flex items-center gap-2">
-
-<img src="/static/images/logo.png" class="h-8">
-
-<h1 class="text-xl font-bold text-green-600">
-ShopIQ
-</h1>
-
-</div>
-
-<div class="flex gap-8 text-gray-700 font-medium">
-
-<a href="/">Home</a>
-<a href="#how">How it Works</a>
-<a href="#about">About</a>
-<a href="/contact">Contact</a>
-<a href="/privacy">Privacy</a>
-<a href="/disclosure">Disclosure</a>
+    <div class="flex gap-4 md:gap-6 text-sm md:text-base mt-3 md:mt-0">
+        <a href="#how" class="hover:text-green-400">How it Works</a>
+        <a href="#about" class="hover:text-green-400">About</a>
+        <a href="/contact" class="hover:text-green-400">Contact</a>
+        <a href="/privacy" class="hover:text-green-400">Privacy</a>
+        <a href="/disclosure" class="hover:text-green-400">Disclosure</a>
+    </div>
 
 </div>
-
-</nav>
-
-
 
 <!-- HERO -->
+<div class="text-center mt-16 px-4">
 
-<section class="text-center mt-28">
+    <h1 class="text-2xl md:text-5xl font-bold">
+        Shop Smarter <span class="text-green-500">Buy Better</span>
+    </h1>
 
-<h1 class="text-5xl font-bold mb-6">
+    <p class="text-gray-400 mt-4 text-sm md:text-base">
+        Compare prices across Amazon, Flipkart, Croma and more.
+    </p>
 
-Shop Smarter
-<span class="text-green-600">Buy Better</span>
+    <form action="/compare" method="POST" class="mt-6 flex flex-col md:flex-row justify-center gap-3">
 
-</h1>
+        <input type="text" name="product"
+            placeholder="Paste product link here..."
+            class="w-full md:w-96 px-4 py-3 rounded-lg text-black">
 
-<p class="text-gray-600 mb-8">
-Compare prices across Amazon, Flipkart, Croma and more.
-</p>
+        <button class="bg-green-600 px-6 py-3 rounded-lg hover:bg-green-700">
+            Compare Now
+        </button>
 
+    </form>
 
-<form action="/compare" method="POST" class="flex justify-center gap-3">
-
-<input
-type="text"
-name="product"
-placeholder="Paste product link here..."
-class="w-96 p-3 border rounded-lg shadow"
-required
->
-
-<button
-class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
-Compare Now
-</button>
-
-</form>
-
-</section>
-
-
+</div>
 
 <!-- HOW IT WORKS -->
+<div id="how" class="mt-20 px-4 md:px-20 text-center">
 
-<section id="how" class="mt-32 px-16 text-center">
+    <h2 class="text-2xl md:text-3xl font-bold mb-10">How It Works</h2>
 
-<h2 class="text-3xl font-bold mb-10">
-How It Works
-</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-<div class="grid grid-cols-3 gap-10">
+        <div class="bg-gray-800 p-6 rounded-xl">
+            <p class="text-lg font-semibold">Paste Product Link</p>
+            <p class="text-gray-400 mt-2 text-sm">
+                Copy the product link from Amazon or Flipkart and paste it here.
+            </p>
+        </div>
 
+        <div class="bg-gray-800 p-6 rounded-xl">
+            <p class="text-lg font-semibold">Compare Prices</p>
+            <p class="text-gray-400 mt-2 text-sm">
+                ShopIQ checks multiple stores and finds best price.
+            </p>
+        </div>
 
-<div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+        <div class="bg-gray-800 p-6 rounded-xl">
+            <p class="text-lg font-semibold">Get Best Deal</p>
+            <p class="text-gray-400 mt-2 text-sm">
+                Choose the best deal and buy at lowest price.
+            </p>
+        </div>
 
-<div class="text-4xl mb-4">
-🔗
-</div>
-
-<h3 class="text-xl font-semibold mb-2">
-Paste Product Link
-</h3>
-
-<p class="text-gray-600">
-Copy the product link from any store like Amazon or Flipkart
-and paste it into ShopIQ.
-</p>
-
-</div>
-
-
-
-<div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-
-<div class="text-4xl mb-4">
-🔍
-</div>
-
-<h3 class="text-xl font-semibold mb-2">
-We Compare Stores
-</h3>
-
-<p class="text-gray-600">
-ShopIQ checks multiple stores and finds where the product
-is available.
-</p>
+    </div>
 
 </div>
-
-
-
-<div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-
-<div class="text-4xl mb-4">
-💰
-</div>
-
-<h3 class="text-xl font-semibold mb-2">
-Get Best Deal
-</h3>
-
-<p class="text-gray-600">
-Choose the best store and buy the product at the best price.
-</p>
-
-</div>
-
-
-</div>
-
-</section>
-
-
 
 <!-- ABOUT -->
+<div id="about" class="mt-20 text-center px-4 md:px-32">
 
-<section id="about" class="mt-32 text-center px-20">
+    <h2 class="text-2xl md:text-3xl font-bold mb-4">About ShopIQ</h2>
 
-<h2 class="text-3xl font-bold mb-6">
-About ShopIQ
-</h2>
+    <p class="text-gray-400 text-sm md:text-base">
+        ShopIQ helps you compare product prices across multiple e-commerce platforms
+        like Amazon, Flipkart and Croma so you always get the best deal quickly.
+    </p>
 
-<p class="text-gray-600 max-w-3xl mx-auto">
-
-ShopIQ helps you compare product prices across multiple e-commerce platforms
-like Amazon, Flipkart and Croma so you always get the best deal quickly.
-
-</p>
-
-</section>
-
-
+</div>
 
 <!-- FOOTER -->
+<div class="mt-20 text-center text-gray-500 text-sm border-t border-gray-800 pt-6 pb-10">
 
-<footer class="mt-32 bg-white py-8 border-t">
+    <p>ShopIQ — Smart Shopping Assistant</p>
 
-<div class="text-center text-gray-600">
+    <div class="flex justify-center gap-4 mt-3 flex-wrap">
+        <a href="#about">About</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/disclosure">Affiliate Disclosure</a>
+    </div>
 
-<p class="mb-4 font-semibold">
-ShopIQ – Smart Shopping Assistant
-</p>
-
-<div class="flex justify-center gap-6 text-sm">
-
-<a href="#about">About</a>
-<a href="/contact">Contact</a>
-<a href="/privacy">Privacy Policy</a>
-<a href="/disclosure">Affiliate Disclosure</a>
+    <p class="mt-3">© 2026 ShopIQ. All rights reserved.</p>
 
 </div>
-
-<p class="mt-6 text-sm text-gray-400">
-© 2026 ShopIQ. All rights reserved.
-</p>
-
-</div>
-
-</footer>
-
 
 </body>
 </html>
