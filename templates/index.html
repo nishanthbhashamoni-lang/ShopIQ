@@ -13,7 +13,8 @@
 <div class="flex flex-wrap justify-between items-center px-4 md:px-10 py-4 border-b border-gray-800">
 
     <div class="flex items-center gap-2">
-        <img src="/static/logo.png" class="w-8 h-8 rounded-full">
+        <!-- ✅ LOGO FIX -->
+        <img src="{{ url_for('static', filename='logo.png') }}" class="w-8 h-8 rounded-full">
         <h1 class="text-lg md:text-xl font-bold text-green-500">ShopIQ</h1>
     </div>
 
@@ -60,23 +61,23 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         <div class="bg-gray-800 p-6 rounded-xl">
-            <p class="text-lg font-semibold">Paste Product Link</p>
+            <h3 class="text-lg font-semibold">🔗 Paste Product Link</h3>
             <p class="text-gray-400 mt-2 text-sm">
                 Copy the product link from Amazon or Flipkart and paste it here.
             </p>
         </div>
 
         <div class="bg-gray-800 p-6 rounded-xl">
-            <p class="text-lg font-semibold">Compare Prices</p>
+            <h3 class="text-lg font-semibold">🔍 Compare Prices</h3>
             <p class="text-gray-400 mt-2 text-sm">
-                ShopIQ checks multiple stores and finds best price.
+                ShopIQ checks multiple stores and finds the best price.
             </p>
         </div>
 
         <div class="bg-gray-800 p-6 rounded-xl">
-            <p class="text-lg font-semibold">Get Best Deal</p>
+            <h3 class="text-lg font-semibold">💰 Get Best Deal</h3>
             <p class="text-gray-400 mt-2 text-sm">
-                Choose the best deal and buy at lowest price.
+                Choose the best deal and buy at the lowest price.
             </p>
         </div>
 
