@@ -8,36 +8,26 @@ def home():
     return render_template("index.html")
 
 
-@app.route("/compare", methods=["POST"])
+@app.route("/compare", methods=["GET", "POST"])
 def compare():
-    product_link = request.form.get("product")
+    if request.method == "POST":
+        product_link = request.form.get("product")
 
-    prices = {
-        "Amazon": random.randint(500, 2000),
-        "Flipkart": random.randint(500, 2000),
-        "Croma": random.randint(500, 2000)
-    }
+        # dummy prices (abhi ke liye)
+        prices = {
+            "Amazon": random.randint(500, 2000),
+            "Flipkart": random.randint(500, 2000),
+            "Croma": random.randint(500, 2000)
+        }
 
-    best_price = min(prices.values())
+        best_price = min(prices.values())
 
-    return render_template(
-        "compare.html",
-        product_link=product_link,
-        prices=prices,
-        best_price=best_price
-    )
+        return render_template(
+            "compare.html",
+            prices=prices,
+            best_price=best_price,
+            product_link=product_link
+        )
 
-
-@app.route("/contact")
-def contact():
-    return render_template("contact.html")
-
-
-@app.route("/privacy")
-def privacy():
-    return render_template("privacy.html")
-
-
-@app.route("/disclosure")
-def disclosure():
-    return render_template("disclosure.html")
+    # agar direct /compare open kare
+    return render_template("compare.html", prices=None)
