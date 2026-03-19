@@ -1,16 +1,16 @@
 from flask import Flask, render_template, request
-import random
+import urllib.parse
 import os
 
 app = Flask(__name__)
 
-# HOME PAGE
+# HOME
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# COMPARE PAGE
+# COMPARE
 @app.route("/compare", methods=["GET", "POST"])
 def compare():
     if request.method == "POST":
@@ -19,45 +19,48 @@ def compare():
         if not product_link:
             return "No product link provided"
 
-        # dummy prices (for now)
-        prices = {
-            "Amazon": random.randint(500, 2000),
-            "Flipkart": random.randint(500, 2000),
-            "Croma": random.randint(500, 2000)
+        # simple keyword (temporary MVP)
+        query = "product"
+
+        if "amazon" in product_link.lower():
+            query = "amazon product"
+        elif "flipkart" in product_link.lower():
+            query = "flipkart product"
+        elif "croma" in product_link.lower():
+            query = "croma product"
+
+        search_query = urllib.parse.quote(query)
+
+        links = {
+            "Amazon": f"https://www.amazon.in/s?k={search_query}",
+            "Flipkart": f"https://www.flipkart.com/search?q={search_query}",
+            "Croma": f"https://www.croma.com/search/?text={search_query}"
         }
 
-        best_price = min(prices.values())
+        return render_template("compare.html", links=links)
 
-        return render_template(
-            "compare.html",
-            prices=prices,
-            best_price=best_price,
-            product_link=product_link
-        )
-
-    # agar user direct /compare open kare
-    return render_template("compare.html", prices=None)
+    return render_template("compare.html", links=None)
 
 
-# CONTACT PAGE
+# CONTACT
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
 
 
-# PRIVACY PAGE
+# PRIVACY
 @app.route("/privacy")
 def privacy():
     return render_template("privacy.html")
 
 
-# DISCLOSURE PAGE
+# DISCLOSURE
 @app.route("/disclosure")
 def disclosure():
     return render_template("disclosure.html")
 
 
-# 🚨 IMPORTANT FOR RENDER (PORT FIX)
+# RENDER FIX
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
