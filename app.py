@@ -5,11 +5,11 @@ import os
 
 app = Flask(__name__)
 
-# 🔐 API KEY (FROM RENDER ENV)
+# 🔐 API KEY
 API_KEY = os.environ.get("API_KEY")
 
 
-# 🟢 AMAZON PRICE
+# 🟢 AMAZON
 def get_amazon_price(query):
     url = "https://real-time-amazon-data.p.rapidapi.com/search"
 
@@ -30,18 +30,24 @@ def get_amazon_price(query):
         products = data.get("data", {}).get("products", [])
 
         if products:
-            price = products[0].get("price")
+            p = products[0]
+
+            price = (
+                p.get("price") or
+                p.get("product_price") or
+                p.get("price_string")
+            )
+
             if price:
-                return price
+                return str(price)
 
     except Exception as e:
         print("Amazon error:", e)
 
-    # 🔥 fallback
-    return f"₹{1500 + len(query)*10}"
+    return None
 
 
-# 🔵 FLIPKART PRICE
+# 🔵 FLIPKART
 def get_flipkart_price(query):
     url = "https://real-time-flipkart-data2.p.rapidapi.com/search"
 
@@ -61,15 +67,21 @@ def get_flipkart_price(query):
         products = data.get("data", {}).get("products", [])
 
         if products:
-            price = products[0].get("price")
+            p = products[0]
+
+            price = (
+                p.get("price") or
+                p.get("selling_price") or
+                p.get("price_string")
+            )
+
             if price:
                 return f"₹{price}"
 
     except Exception as e:
         print("Flipkart error:", e)
 
-    # 🔥 fallback
-    return f"₹{1400 + len(query)*10}"
+    return None
 
 
 # 🏠 HOME
@@ -97,12 +109,19 @@ def compare():
     if len(query) < 3:
         query = "product"
 
-    # 🔥 GET PRICES
+    # 🔥 GET REAL PRICES
     amazon_price = get_amazon_price(query)
     flipkart_price = get_flipkart_price(query)
 
-    # 🟡 CROMA (fallback always)
-    croma_price = f"₹{1600 + len(query)*10}"
+    # 🚨 fallback ONLY if API fails
+    if not amazon_price:
+        amazon_price = f"₹{1500 + len(query)*7}"
+
+    if not flipkart_price:
+        flipkart_price = f"₹{1400 + len(query)*9}"
+
+    # 🟡 CROMA (dummy for now)
+    croma_price = f"₹{1600 + len(query)*5}"
 
     prices = {
         "Amazon": amazon_price,
@@ -110,7 +129,7 @@ def compare():
         "Croma": croma_price
     }
 
-    # 🔗 SEARCH LINKS
+    # 🔗 LINKS
     search_query = urllib.parse.quote(query)
 
     links = {
