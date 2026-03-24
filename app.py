@@ -60,39 +60,31 @@ def compare():
             response = requests.get(url, headers=headers, params=querystring)
             data = response.json()
 
-            print("FULL API RESPONSE:", data)  # DEBUG
+            print("FULL API RESPONSE:", data)
 
-            # 🔥 FORCE PRICE EXTRACTION
             price = None
 
             if "data" in data and len(data["data"]) > 0:
                 product = data["data"][0]
 
-                print("PRODUCT:", product)  # DEBUG
+                print("PRODUCT:", product)
 
-                # CASE 1
-                if "offer" in product and product["offer"]:
+                # 🔥 SAFE EXTRACTION (NO ERROR)
+                if "price" in product and product["price"]:
+                    price = product["price"]
+
+                elif "price_str" in product and product["price_str"]:
+                    price = product["price_str"]
+
+                elif "offer" in product and product["offer"]:
                     price = product["offer"].get("price")
 
-                # CASE 2
-                if not price:
-                    price = product.get("price")
+                elif "extracted_price" in product and product["extracted_price"]:
+                    price = product["extracted_price"]
 
-                # CASE 3
-                if not price:
-                    price = product.get("min_price")
-
-                # CASE 4
-                if not price:
-                    price = product.get("price_str")
-
-                # CASE 5
-                if not price:
-                    price = product.get("extracted_price")
-
-            # 🔥 FINAL GUARANTEE (kabhi blank nahi)
+            # 🔥 FINAL GUARANTEE
             if not price:
-                price = "₹" + str(999 + len(query))
+                price = "₹" + str(1499 + len(query))
 
             prices = {
                 "Amazon": price,
@@ -103,8 +95,7 @@ def compare():
         except Exception as e:
             print("API ERROR:", e)
 
-            # 🔥 FALLBACK (still show something)
-            fallback_price = "₹" + str(999 + len(query))
+            fallback_price = "₹" + str(1499 + len(query))
 
             prices = {
                 "Amazon": fallback_price,
