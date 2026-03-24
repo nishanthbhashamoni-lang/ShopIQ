@@ -9,7 +9,7 @@ app = Flask(__name__)
 API_KEY = os.environ.get("API_KEY")
 
 
-# 🟢 AMAZON
+# 🟢 AMAZON PRICE
 def get_amazon_price(query):
     url = "https://real-time-amazon-data.p.rapidapi.com/search"
 
@@ -47,7 +47,7 @@ def get_amazon_price(query):
     return None
 
 
-# 🔵 FLIPKART
+# 🔵 FLIPKART PRICE
 def get_flipkart_price(query):
     url = "https://real-time-flipkart-data2.p.rapidapi.com/search"
 
@@ -120,7 +120,7 @@ def compare():
     if not flipkart_price:
         flipkart_price = f"₹{1400 + len(query)*9}"
 
-    # 🟡 CROMA (dummy for now)
+    # 🟡 CROMA dummy
     croma_price = f"₹{1600 + len(query)*5}"
 
     prices = {
@@ -158,9 +158,3 @@ def privacy():
 @app.route("/disclosure")
 def disclosure():
     return render_template("disclosure.html")
-
-
-# 🚀 RUN
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
