@@ -1,69 +1,121 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Compare - ShopIQ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<title>Compare - ShopIQ</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-950 text-white">
 
 <!-- NAVBAR -->
 <div class="flex justify-between items-center px-6 py-4 border-b border-gray-800">
-    <div class="flex items-center gap-2">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" class="w-8 h-8 rounded-full">
-        <h1 class="text-xl font-bold text-green-500">ShopIQ</h1>
-    </div>
-
+    <h1 class="text-xl font-bold text-green-400">ShopIQ</h1>
     <a href="/" class="text-gray-300">Home</a>
 </div>
 
-<!-- CONTENT -->
 <div class="px-6 md:px-20 mt-10">
 
-    {% if links %}
+{% if links %}
 
-    <h2 class="text-2xl md:text-3xl font-bold text-center mb-4">
-        Compare Deals
-    </h2>
+<!-- TITLE -->
+<h2 class="text-2xl md:text-3xl font-bold text-center mb-2">
+Compare Results
+</h2>
 
-    <p class="text-center text-gray-400 mb-2">
-        Searching for:
-        <span class="text-white font-semibold">{{ query }}</span>
-    </p>
+<p class="text-center text-gray-400 mb-2">
+Searching for: <span class="text-white">{{ query }}</span>
+</p>
 
-    <p class="text-center text-gray-500 mb-8">
-        Showing similar products across platforms
-    </p>
+<p class="text-center text-gray-500 mb-8">
+Prices may vary. Click to check latest deals.
+</p>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- 🔥 CARDS SECTION -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
 
-        {% for platform, link in links.items() %}
+{% for platform, link in links.items() %}
 
-        <div class="bg-gray-900 p-6 rounded-xl text-center shadow-lg hover:scale-105 transition">
+<div class="bg-gray-900 p-6 rounded-xl text-center shadow-lg hover:scale-105 transition relative">
 
-            <h3 class="text-xl font-semibold mb-4">
-                {{ platform }}
-            </h3>
-
-            <a href="{{ link }}" target="_blank"
-               class="bg-green-600 px-6 py-3 rounded-lg hover:bg-green-700">
-               View Deal 🔗
-            </a>
-
-        </div>
-
-        {% endfor %}
-
-    </div>
-
-    {% else %}
-
-    <div class="text-center text-gray-400 mt-20">
-        No data available. Please go back and paste a product link.
-    </div>
-
+    {% if loop.index == 1 %}
+    <span class="absolute top-3 right-3 bg-green-600 text-xs px-2 py-1 rounded">
+        Recommended
+    </span>
     {% endif %}
+
+    <h3 class="text-xl font-semibold mb-3">
+        {{ platform }}
+    </h3>
+
+    <!-- PRICE -->
+    <p class="text-green-400 text-lg font-bold mb-3">
+        {% if prices and prices[platform] %}
+            {{ prices[platform] }}
+        {% else %}
+            Check Price
+        {% endif %}
+    </p>
+
+    <a href="{{ link }}" target="_blank"
+       class="bg-green-600 px-6 py-3 rounded-lg hover:bg-green-700">
+       View Deal 🔗
+    </a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<!-- 🔥 TABLE SECTION (DETAIL VIEW) -->
+<div class="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
+
+<table class="w-full text-center">
+
+<tr class="bg-gray-800 text-gray-300">
+<th class="p-4">Platform</th>
+<th class="p-4">Price</th>
+<th class="p-4">Rating</th>
+<th class="p-4">Reviews</th>
+</tr>
+
+{% for item in comparison %}
+
+<tr class="{% if item.best %}bg-green-900{% endif %} border-b border-gray-800">
+
+<td class="p-4">{{ item.platform }}</td>
+
+<td class="p-4">
+    {% if item.price %}
+        ₹{{ item.price }}
+    {% else %}
+        N/A
+    {% endif %}
+
+    {% if item.best %}
+    <span class="text-green-400 font-bold block">Best Deal 🔥</span>
+    {% endif %}
+</td>
+
+<td class="p-4">⭐ {{ item.rating or "N/A" }}</td>
+
+<td class="p-4">{{ item.reviews or "N/A" }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+{% else %}
+
+<div class="text-center text-gray-400 mt-20">
+No data available. Please go back and paste a product link.
+</div>
+
+{% endif %}
 
 </div>
 
