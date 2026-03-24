@@ -1,22 +1,17 @@
 from flask import Flask, render_template, request
 import urllib.parse
-import os
 import requests
+import os
 
 app = Flask(__name__)
 
-# 🔥 RapidAPI config (abhi blank rakho ya baad me add karo)
-API_KEY = "YOUR_API_KEY_HERE"
-API_HOST = "real-time-product-search.p.rapidapi.com"
+API_KEY = "afea838a8bmshe9ad263202583ecp198ed5jsnef25381c1cba"   # 👈 yaha paste kar
 
-
-# HOME
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# COMPARE
 @app.route("/compare", methods=["GET", "POST"])
 def compare():
     if request.method == "POST":
@@ -25,7 +20,7 @@ def compare():
         if not product_link:
             return "No product link provided"
 
-        # 🔥 PRODUCT NAME EXTRACT
+        # 🔥 PRODUCT NAME CLEAN EXTRACTION
         try:
             query = product_link.split("/")[-1]
             query = query.split("?")[0]
@@ -38,97 +33,78 @@ def compare():
 
         search_query = urllib.parse.quote(query)
 
-        # 🔥 AFFILIATE / SEARCH LINKS
         links = {
             "Amazon": f"https://www.amazon.in/s?k={search_query}",
             "Flipkart": f"https://www.flipkart.com/search?q={search_query}",
             "Croma": f"https://www.croma.com/search/?text={search_query}"
         }
 
-        # 🔥 API PRICE DATA (optional)
         prices = {}
 
         try:
             url = "https://real-time-product-search.p.rapidapi.com/search"
-            querystring = {"q": query, "country": "in"}
+
+            querystring = {
+                "q": query,
+                "country": "in"
+            }
 
             headers = {
                 "X-RapidAPI-Key": API_KEY,
-                "X-RapidAPI-Host": API_HOST
+                "X-RapidAPI-Host": "real-time-product-search.p.rapidapi.com"
             }
 
-            response = requests.get(url, headers=headers, params=querystring, timeout=5)
+            response = requests.get(url, headers=headers, params=querystring)
             data = response.json()
+
+            print("FULL API:", data)  # 🔍 DEBUG
 
             if "data" in data and len(data["data"]) > 0:
                 product = data["data"][0]
 
-                price_value = product.get("price", None)
+                # 🔥 MULTIPLE PRICE FALLBACKS
+                price = (
+                    product.get("offer", {}).get("price")
+                    or product.get("price")
+                    or product.get("min_price")
+                    or "N/A"
+                )
 
                 prices = {
-                    "Amazon": price_value,
-                    "Flipkart": price_value,
-                    "Croma": price_value
+                    "Amazon": price,
+                    "Flipkart": price,
+                    "Croma": price
                 }
 
-        except:
+        except Exception as e:
+            print("API ERROR:", e)
             prices = {}
-
-        # 🔥 TABLE DATA (FOR UI)
-        comparison = [
-            {
-                "platform": "Amazon",
-                "price": prices.get("Amazon"),
-                "rating": 4.3,
-                "reviews": 1200,
-                "best": True
-            },
-            {
-                "platform": "Flipkart",
-                "price": prices.get("Flipkart"),
-                "rating": 4.2,
-                "reviews": 900,
-                "best": False
-            },
-            {
-                "platform": "Croma",
-                "price": prices.get("Croma"),
-                "rating": 4.1,
-                "reviews": 500,
-                "best": False
-            }
-        ]
 
         return render_template(
             "compare.html",
             links=links,
             prices=prices,
-            query=query,
-            comparison=comparison
+            query=query
         )
 
     return render_template("compare.html", links=None)
 
 
-# CONTACT
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
 
 
-# PRIVACY
 @app.route("/privacy")
 def privacy():
     return render_template("privacy.html")
 
 
-# DISCLOSURE
 @app.route("/disclosure")
 def disclosure():
     return render_template("disclosure.html")
 
 
-# 🚨 RENDER SAFE RUN
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
