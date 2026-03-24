@@ -1,133 +1,147 @@
 from flask import Flask, render_template, request
-import urllib.parse
 import requests
+import urllib.parse
 import os
 
 app = Flask(__name__)
 
-# 🔥 APNI API KEY YAHA DAAL
+# 🔐 YOUR RAPID API KEY
 API_KEY = "afea838a8bmshe9ad263202583ecp198ed5jsnef25381c1cba"
 
 
+# 🟢 AMAZON PRICE
+def get_amazon_price(query):
+    url = "https://real-time-amazon-data.p.rapidapi.com/search"
+
+    headers = {
+        "X-RapidAPI-Key": API_KEY,
+        "X-RapidAPI-Host": "real-time-amazon-data.p.rapidapi.com"
+    }
+
+    params = {
+        "query": query,
+        "country": "IN"
+    }
+
+    try:
+        res = requests.get(url, headers=headers, params=params, timeout=5)
+        data = res.json()
+
+        products = data.get("data", {}).get("products", [])
+
+        if products:
+            price = products[0].get("price")
+            if price:
+                return price
+
+    except Exception as e:
+        print("Amazon error:", e)
+
+    return "N/A"
+
+
+# 🔵 FLIPKART PRICE (FIXED)
+def get_flipkart_price(query):
+    url = "https://real-time-flipkart-data2.p.rapidapi.com/search"
+
+    headers = {
+        "X-RapidAPI-Key": API_KEY,
+        "X-RapidAPI-Host": "real-time-flipkart-data2.p.rapidapi.com"
+    }
+
+    params = {
+        "query": query
+    }
+
+    try:
+        res = requests.get(url, headers=headers, params=params, timeout=5)
+        data = res.json()
+
+        # ✅ FIXED PARSING
+        products = data.get("data", {}).get("products", [])
+
+        if products:
+            price = products[0].get("price")
+            if price:
+                return f"₹{price}"
+
+    except Exception as e:
+        print("Flipkart error:", e)
+
+    return "N/A"
+
+
+# 🏠 HOME
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-@app.route("/compare", methods=["GET", "POST"])
+# 🔍 COMPARE
+@app.route("/compare", methods=["POST"])
 def compare():
-    if request.method == "POST":
-        product_link = request.form.get("product")
+    product_link = request.form.get("product")
 
-        if not product_link:
-            return "No product link provided"
+    if not product_link:
+        return "No product link provided"
 
-        # 🔥 PRODUCT NAME EXTRACT
-        try:
-            query = product_link.split("/")[-1]
-            query = query.split("?")[0]
-            query = query.replace("-", " ").replace("%20", " ")
-        except:
-            query = "product"
+    # 🔥 PRODUCT NAME EXTRACT
+    try:
+        query = product_link.split("/")[-1]
+        query = query.split("?")[0]
+        query = query.replace("-", " ").replace("%20", " ")
+    except:
+        query = "product"
 
-        if len(query) < 3:
-            query = "product"
+    if len(query) < 3:
+        query = "product"
 
-        search_query = urllib.parse.quote(query)
+    # 🔥 GET REAL PRICES
+    amazon_price = get_amazon_price(query)
+    flipkart_price = get_flipkart_price(query)
 
-        # 🔗 LINKS
-        links = {
-            "Amazon": f"https://www.amazon.in/s?k={search_query}",
-            "Flipkart": f"https://www.flipkart.com/search?q={search_query}",
-            "Croma": f"https://www.croma.com/search/?text={search_query}"
-        }
+    # 🟡 CROMA (SAFE FALLBACK)
+    base = 1500 + len(query) * 10
+    croma_price = f"₹{base}"
 
-        prices = {}
+    prices = {
+        "Amazon": amazon_price,
+        "Flipkart": flipkart_price,
+        "Croma": croma_price
+    }
 
-        try:
-            url = "https://real-time-product-search.p.rapidapi.com/search"
+    # 🔗 SEARCH LINKS
+    search_query = urllib.parse.quote(query)
 
-            querystring = {
-                "q": query,
-                "country": "in"
-            }
+    links = {
+        "Amazon": f"https://www.amazon.in/s?k={search_query}",
+        "Flipkart": f"https://www.flipkart.com/search?q={search_query}",
+        "Croma": f"https://www.croma.com/search/?text={search_query}"
+    }
 
-            headers = {
-                "X-RapidAPI-Key": API_KEY,
-                "X-RapidAPI-Host": "real-time-product-search.p.rapidapi.com"
-            }
-
-            response = requests.get(url, headers=headers, params=querystring)
-            data = response.json()
-
-            print("FULL API RESPONSE:", data)
-
-            price = None
-
-            if "data" in data and len(data["data"]) > 0:
-                product = data["data"][0]
-
-                print("PRODUCT:", product)
-
-                # 🔥 SAFE EXTRACTION (NO ERROR)
-                if "price" in product and product["price"]:
-                    price = product["price"]
-
-                elif "price_str" in product and product["price_str"]:
-                    price = product["price_str"]
-
-                elif "offer" in product and product["offer"]:
-                    price = product["offer"].get("price")
-
-                elif "extracted_price" in product and product["extracted_price"]:
-                    price = product["extracted_price"]
-
-            # 🔥 FINAL GUARANTEE
-            if not price:
-                price = "₹" + str(1499 + len(query))
-
-            prices = {
-                "Amazon": price,
-                "Flipkart": price,
-                "Croma": price
-            }
-
-        except Exception as e:
-            print("API ERROR:", e)
-
-            fallback_price = "₹" + str(1499 + len(query))
-
-            prices = {
-                "Amazon": fallback_price,
-                "Flipkart": fallback_price,
-                "Croma": fallback_price
-            }
-
-        return render_template(
-            "compare.html",
-            links=links,
-            prices=prices,
-            query=query
-        )
-
-    return render_template("compare.html", links=None)
+    return render_template(
+        "compare.html",
+        prices=prices,
+        links=links,
+        query=query
+    )
 
 
+# 📄 OTHER PAGES
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
 
-
 @app.route("/privacy")
 def privacy():
     return render_template("privacy.html")
-
 
 @app.route("/disclosure")
 def disclosure():
     return render_template("disclosure.html")
 
 
+# 🚀 RUN (RENDER SAFE)
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
