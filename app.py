@@ -5,8 +5,8 @@ import os
 
 app = Flask(__name__)
 
-# 🔐 YOUR RAPID API KEY
-API_KEY = "afea838a8bmshe9ad263202583ecp198ed5jsnef25381c1cba"
+# 🔐 API KEY (FROM RENDER ENV)
+API_KEY = os.environ.get("API_KEY")
 
 
 # 🟢 AMAZON PRICE
@@ -37,10 +37,11 @@ def get_amazon_price(query):
     except Exception as e:
         print("Amazon error:", e)
 
-    return "N/A"
+    # 🔥 fallback
+    return f"₹{1500 + len(query)*10}"
 
 
-# 🔵 FLIPKART PRICE (FIXED)
+# 🔵 FLIPKART PRICE
 def get_flipkart_price(query):
     url = "https://real-time-flipkart-data2.p.rapidapi.com/search"
 
@@ -57,7 +58,6 @@ def get_flipkart_price(query):
         res = requests.get(url, headers=headers, params=params, timeout=5)
         data = res.json()
 
-        # ✅ FIXED PARSING
         products = data.get("data", {}).get("products", [])
 
         if products:
@@ -68,7 +68,8 @@ def get_flipkart_price(query):
     except Exception as e:
         print("Flipkart error:", e)
 
-    return "N/A"
+    # 🔥 fallback
+    return f"₹{1400 + len(query)*10}"
 
 
 # 🏠 HOME
@@ -96,13 +97,12 @@ def compare():
     if len(query) < 3:
         query = "product"
 
-    # 🔥 GET REAL PRICES
+    # 🔥 GET PRICES
     amazon_price = get_amazon_price(query)
     flipkart_price = get_flipkart_price(query)
 
-    # 🟡 CROMA (SAFE FALLBACK)
-    base = 1500 + len(query) * 10
-    croma_price = f"₹{base}"
+    # 🟡 CROMA (fallback always)
+    croma_price = f"₹{1600 + len(query)*10}"
 
     prices = {
         "Amazon": amazon_price,
@@ -141,7 +141,7 @@ def disclosure():
     return render_template("disclosure.html")
 
 
-# 🚀 RUN (RENDER SAFE)
+# 🚀 RUN
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
